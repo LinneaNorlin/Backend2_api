@@ -15,6 +15,8 @@ namespace WebApi.Models
         public string Description { get; set; } = "No description for this product";
 
 
+        public TechDescrRequest TechDescription { get; set; }
+
         public CategoryRequest Category { get; set; }
     }
 }

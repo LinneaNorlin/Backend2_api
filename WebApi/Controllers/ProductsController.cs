@@ -30,7 +30,8 @@ namespace WebApi.Controllers
                     ProductName = req.ProductName,
                     Price = req.Price,
                     Description = req.Description,
-                    Category = req.Category
+                    Category = req.Category,
+                    TechDescription = req.TechDescription,
                 };
 
                 _context.Add(Product);
@@ -57,7 +58,8 @@ namespace WebApi.Controllers
                         ProductName = p.ProductName,
                         Price = p.Price,
                         Description = p.Description,
-                        Category = p.Category
+                        Category = p.Category,
+                        TechDescription = p.TechDescription
                     });
 
                 return new OkObjectResult(products);

@@ -11,6 +11,8 @@
         public string Description { get; set; } = null!;
 
 
+        public TechDescrRequest TechDescription { get; set; }
+
         public CategoryRequest Category { get; set; }
 
     }
