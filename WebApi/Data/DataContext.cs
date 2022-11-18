@@ -15,5 +15,7 @@ namespace WebApi.Data
         {
             modelBuilder.Entity<Product>().ToContainer("Products").HasPartitionKey(x => x.Id);
         }
+
+
     }
 }

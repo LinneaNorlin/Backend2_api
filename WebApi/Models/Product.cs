@@ -1,4 +1,6 @@
-﻿namespace WebApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApi.Models
 {
     public class Product
     {
@@ -11,5 +13,8 @@
         public decimal Price { get; set; }
 
         public string Description { get; set; } = "No description for this product";
+
+
+        public CategoryRequest Category { get; set; }
     }
 }
