@@ -22,37 +22,46 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ProductRequest req)
         {
-            var Product = new Product
+            try 
             {
-                ArticleNumber = req.ArticleNumber,
-                ProductName = req.ProductName,
-                Price = req.Price,
-                Description = req.Description
-            };
+                var Product = new Product
+                {
+                    ArticleNumber = req.ArticleNumber,
+                    ProductName = req.ProductName,
+                    Price = req.Price,
+                    Description = req.Description
+                };
 
-            _context.Add(Product);
-            await _context.SaveChangesAsync();
+                _context.Add(Product);
+                await _context.SaveChangesAsync();
 
-            return new OkResult();
+                return new OkResult();
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
         }
 
 
         [HttpGet]
         public async Task<IActionResult>GetAll()
         {
+            try 
+            {
+                var products = new List<ProductResponse>();
+                foreach (var p in await _context.Products.ToListAsync())
+                    products.Add(new ProductResponse
+                    {
+                        Id = p.Id,
+                        ArticleNumber = p.ArticleNumber,
+                        ProductName = p.ProductName,
+                        Price = p.Price,
+                        Description = p.Description
+                    });
 
-            var products = new List<ProductResponse>();
-            foreach (var p in await _context.Products.ToListAsync())
-                products.Add(new ProductResponse
-                {
-                    Id = p.Id,
-                    ArticleNumber = p.ArticleNumber,
-                    ProductName = p.ProductName,
-                    Price = p.Price,
-                    Description = p.Description
-                });
-
-            return new OkObjectResult(products);
+                return new OkObjectResult(products);
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
         }
 
 
