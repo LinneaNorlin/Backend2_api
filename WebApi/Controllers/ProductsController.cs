@@ -7,7 +7,7 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ProductRequest req)
         {
-            try 
+            try
             {
                 var Product = new Product
                 {
@@ -45,9 +45,9 @@ namespace WebApi.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult>GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            try 
+            try
             {
                 var products = new List<ProductResponse>();
                 foreach (var p in await _context.Products.ToListAsync())
@@ -87,7 +87,7 @@ namespace WebApi.Controllers
             try
             {
                 var _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
-                if(_product != null)
+                if (_product != null)
                 {
                     _product.ProductName = product.ProductName;
                     _product.Price = product.Price;
@@ -127,6 +127,28 @@ namespace WebApi.Controllers
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
             return new BadRequestResult();
         }
+
+
+        [HttpGet("{CategoryName}")]
+        public async Task<IActionResult> GetByCat(string CategoryName)
+        {
+            try
+            {
+                var products = new List<CategoryResponse>();
+                foreach (var p in _context.Products.Where(x => x.Category.CategoryName == CategoryName))
+                    products.Add(new CategoryResponse
+                    {
+                        ProductName = p.ProductName,
+                        Category = p.Category,
+                        ArticleNumber = p.ArticleNumber
+                    });
+
+                return new OkObjectResult(products);
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
+        }
+
 
     }
 }

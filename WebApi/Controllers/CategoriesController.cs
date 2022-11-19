@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Xml.Linq;
 using WebApi.Data;
 using WebApi.Models;
 
@@ -19,10 +20,6 @@ namespace WebApi.Controllers
         }
 
 
-        
-
-
-
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -31,10 +28,8 @@ namespace WebApi.Controllers
                 return new OkObjectResult(new CategoryResponse
                 {
                     Category = Product.Category,
-                    
                     ProductName = Product.ProductName,
                     ArticleNumber = Product.ArticleNumber
-
                 });
 
             return new NotFoundResult();
