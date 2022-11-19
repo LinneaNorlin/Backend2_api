@@ -82,16 +82,17 @@ namespace WebApi.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, Product product)
+        public async Task<IActionResult> Update(Guid id, ProductUpdateRequest req)
         {
             try
             {
-                var _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+                var _product = await _context.Products.FindAsync(id);
                 if (_product != null)
                 {
-                    _product.ProductName = product.ProductName;
-                    _product.Price = product.Price;
-                    _product.Description = product.Description;
+                    _product.ArticleNumber = req.ArticleNumber;
+                    _product.ProductName = req.ProductName;
+                    _product.Price = req.Price;
+                    _product.Description = req.Description;
 
                     _context.Update(_product);
                     await _context.SaveChangesAsync();
@@ -103,7 +104,7 @@ namespace WebApi.Controllers
                 }
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
-            return new BadRequestResult();
+            return new NotFoundResult();
         }
 
 
