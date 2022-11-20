@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Models
 {
-    public class ProductRequest
+    public class ProductUpdateRequest
     {
         public string ArticleNumber { get; set; } = null!;
 
@@ -9,11 +9,5 @@
         public decimal Price { get; set; }
 
         public string Description { get; set; } = null!;
-
-
-        public TechDescrRequest TechDescription { get; set; }
-
-        public CategoryRequest Category { get; set; }
-
     }
 }

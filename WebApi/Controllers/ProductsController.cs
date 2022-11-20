@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using WebApi.Data;
@@ -7,7 +8,7 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -22,37 +23,50 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ProductRequest req)
         {
-            var Product = new Product
+            try
             {
-                ArticleNumber = req.ArticleNumber,
-                ProductName = req.ProductName,
-                Price = req.Price,
-                Description = req.Description
-            };
+                var Product = new Product
+                {
+                    ArticleNumber = req.ArticleNumber,
+                    ProductName = req.ProductName,
+                    Price = req.Price,
+                    Description = req.Description,
+                    Category = req.Category,
+                    TechDescription = req.TechDescription,
+                };
 
-            _context.Add(Product);
-            await _context.SaveChangesAsync();
+                _context.Add(Product);
+                await _context.SaveChangesAsync();
 
-            return new OkResult();
+                return new OkResult();
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
         }
 
 
         [HttpGet]
-        public async Task<IActionResult>GetAll()
+        public async Task<IActionResult> GetAll()
         {
+            try
+            {
+                var products = new List<ProductResponse>();
+                foreach (var p in await _context.Products.ToListAsync())
+                    products.Add(new ProductResponse
+                    {
+                        Id = p.Id,
+                        ArticleNumber = p.ArticleNumber,
+                        ProductName = p.ProductName,
+                        Price = p.Price,
+                        Description = p.Description,
+                        Category = p.Category,
+                        TechDescription = p.TechDescription
+                    });
 
-            var products = new List<ProductResponse>();
-            foreach (var p in await _context.Products.ToListAsync())
-                products.Add(new ProductResponse
-                {
-                    Id = p.Id,
-                    ArticleNumber = p.ArticleNumber,
-                    ProductName = p.ProductName,
-                    Price = p.Price,
-                    Description = p.Description
-                });
-
-            return new OkObjectResult(products);
+                return new OkObjectResult(products);
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
         }
 
 
@@ -69,16 +83,17 @@ namespace WebApi.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, Product product)
+        public async Task<IActionResult> Update(Guid id, ProductUpdateRequest req)
         {
             try
             {
-                var _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
-                if(_product != null)
+                var _product = await _context.Products.FindAsync(id);
+                if (_product != null)
                 {
-                    _product.ProductName = product.ProductName;
-                    _product.Price = product.Price;
-                    _product.Description = product.Description;
+                    _product.ArticleNumber = req.ArticleNumber;
+                    _product.ProductName = req.ProductName;
+                    _product.Price = req.Price;
+                    _product.Description = req.Description;
 
                     _context.Update(_product);
                     await _context.SaveChangesAsync();
@@ -90,7 +105,7 @@ namespace WebApi.Controllers
                 }
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
-            return new BadRequestResult();
+            return new NotFoundResult();
         }
 
 
@@ -114,6 +129,28 @@ namespace WebApi.Controllers
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
             return new BadRequestResult();
         }
+
+
+        [HttpGet("{CategoryName}")]
+        public async Task<IActionResult> GetByCat(string CategoryName)
+        {
+            try
+            {
+                var products = new List<CategoryResponse>();
+                foreach (var p in _context.Products.Where(x => x.Category.CategoryName == CategoryName))
+                    products.Add(new CategoryResponse
+                    {
+                        ProductName = p.ProductName,
+                        Category = p.Category,
+                        ArticleNumber = p.ArticleNumber
+                    });
+
+                return new OkObjectResult(products);
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return new BadRequestResult();
+        }
+
 
     }
 }
